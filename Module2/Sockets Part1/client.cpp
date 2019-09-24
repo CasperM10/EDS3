@@ -36,6 +36,7 @@ void connect(int socketFd)
             close(socketFd);
             exit(EXIT_FAILURE);
         }
+        std::cout << "Connected!";
 	}
 }
 
@@ -48,7 +49,7 @@ void disconnect(int socketFd)
         exit(EXIT_FAILURE);
     }
     close(socketFd);
-    //return EXIT_SUCCESS;
+    std::cout << "Disconnected!";
 }
 
 void sendMessage(std::string message, int socketFd)
@@ -86,7 +87,7 @@ static void showMenu()
 
 int main(void)
 {
-	int socketFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int socketFd;
 	bool quit = false;
 
     while (!quit)
@@ -99,16 +100,16 @@ int main(void)
         switch (choice)
         {
         case '1' :
+			socketFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
             connect(socketFd);
             break;
         case '2' :
             disconnect(socketFd);
-            return 0;
             break;
         case '3' :
 			std::cout << "What would you like to send?" << std::endl << "Message: ";
-			
 			std::cin >> input;
+			std::cin.ignore();
             sendMessage(input, socketFd);
             break;
         case '4' :

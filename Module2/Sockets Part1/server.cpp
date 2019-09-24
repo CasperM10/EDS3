@@ -45,28 +45,30 @@ int main(void)
             close(listenFd);
             exit(EXIT_FAILURE);
         }
-
-        const int BufferSize = 100;
-        char buffer[BufferSize];
-        int nrBytes = read(communicationFd, buffer, BufferSize - 1);
-        if (nrBytes >= 0)
-        {
-            buffer[nrBytes] = '\0';
-            std::cout << "received " << nrBytes << " bytes: " << buffer << std::endl;
-            char acknowledge[12] = "Acknowledge";
-            write(communicationFd, acknowledge, 11);
-        }
-        
-        if (shutdown(communicationFd, SHUT_RDWR) < 0)
-        {
-            perror("shutdown failed");
-            close(communicationFd);
-            close(listenFd);
-            exit(EXIT_FAILURE);
-        }
+		const int BufferSize = 100;
+		char buffer[BufferSize];
+		int nrBytes;
+		do
+		{
+			nrBytes = read(communicationFd, buffer, BufferSize - 1);
+			if (nrBytes > 0)
+			{
+				buffer[nrBytes] = '\0';
+				std::cout << "received " << nrBytes << " bytes: " << buffer << std::endl;
+				std::string ack = "Acknowledge";
+				send(communicationFd, ack.c_str(), ack.length(), 0);
+			}
+		} while(nrBytes > 0);
+		
+		if (shutdown(communicationFd, SHUT_RDWR) < 0)
+		{
+			perror("shutdown failed");
+			close(communicationFd);
+			close(listenFd);
+			exit(EXIT_FAILURE);
+		}
         close(communicationFd);
     }
-
     close(listenFd);
     return EXIT_SUCCESS;
 }
